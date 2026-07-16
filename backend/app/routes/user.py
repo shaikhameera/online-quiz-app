@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request, HTTPException
 from app.models.user import UserRegister
 from app.database import users_collection
 from app.utils.security import hash_password
-from fastapi import Request
 from app.models.user import UserLogin
 from app.database import users_collection
 from app.utils.security import verify_password
@@ -82,8 +81,9 @@ def get_me(request: Request):
     user = request.session.get("user")
 
     if not user:
-        return {
-            "message": "Not Logged In"
-        }
+         raise HTTPException(
+            status_code=401,
+            detail="Not Logged In"
+        )
 
     return user
