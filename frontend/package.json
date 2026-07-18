@@ -18,12 +18,12 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-hot-toast": "^2.6.0",
+    "react-icons": "^5.7.0",
     "react-router-dom": "^7.18.1",
     "tailwindcss": "^4.3.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@gravity-ui/icons": "^2.20.0",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

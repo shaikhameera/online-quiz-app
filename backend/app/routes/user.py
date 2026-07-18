@@ -48,13 +48,19 @@ def login(
     )
 
     if not db_user:
-        return {"message": "Invalid Email"}
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid Email"
+        )
 
     if not verify_password(
         user.password,
         db_user["password"]
     ):
-        return {"message": "Invalid Password"}
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid Password"
+        )
 
     request.session["user"] = {
         "email": db_user["email"],
