@@ -24,7 +24,9 @@ app.add_middleware(
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key=os.getenv("SECRET_KEY")
+    secret_key=os.getenv("SECRET_KEY"),
+    same_site="none",
+    https_only=True,
 )
 
 app.include_router(admin_router)
