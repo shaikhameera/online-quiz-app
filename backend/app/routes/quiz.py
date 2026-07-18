@@ -58,7 +58,7 @@ def submit_quiz(
             "is_correct": is_correct
         })
 
-    total_questions = len(submission.answers)
+    total_questions = questions_collection.count_documents({})
 
     percentage = (
         score / total_questions * 100

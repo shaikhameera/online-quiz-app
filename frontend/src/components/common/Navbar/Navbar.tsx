@@ -182,13 +182,13 @@ export default function Navbar({
                 Login
               </Link>
 
-              <Link
+              {/* <Link
                 to="/register"
                 onClick={closeMenu}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-center font-medium text-white transition hover:bg-blue-700"
               >
                 Register
-              </Link>
+              </Link> */}
             </div>
           )}
         </div>
