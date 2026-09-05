@@ -3,13 +3,14 @@ import type { QuizAttempt } from "./types";
 
 interface Props {
   attempts: QuizAttempt[];
+  title?: string;
 }
 
-const RecentAttempts = ({ attempts }: Props) => {
+const RecentAttempts = ({ attempts, title = "Recent Attempts" }: Props) => {
   return (
     <section className="mt-10">
       <h2 className="mb-5 text-2xl font-bold">
-        Recent Attempts
+        {title}
       </h2>
 
       <Card>
@@ -19,6 +20,7 @@ const RecentAttempts = ({ attempts }: Props) => {
               <tr className="border-b text-left">
                 <th className="p-4">Quiz</th>
                 <th className="p-4">Score</th>
+                <th className="p-4">Percentage</th>
                 <th className="p-4">Date</th>
               </tr>
             </thead>
@@ -27,7 +29,7 @@ const RecentAttempts = ({ attempts }: Props) => {
               {attempts.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={3}
+                    colSpan={4}
                     className="p-8 text-center text-gray-500"
                   >
                     No quiz attempts yet.
@@ -47,10 +49,11 @@ const RecentAttempts = ({ attempts }: Props) => {
                       {attempt.score}/{attempt.totalMarks}
                     </td>
 
+                    <td className="p-4">{attempt.percentage}%</td>
                     <td className="p-4">
                       {new Date(
                         attempt.attemptedAt
-                      ).toLocaleDateString()}
+                      ).toLocaleString()}
                     </td>
                   </tr>
                 ))

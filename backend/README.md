@@ -185,3 +185,43 @@ Frontend:
 Ameera Shaikh
 
 TY BSc Computer Science
+
+
+## Subject quiz batches
+
+Configure the current batch in Admin / Questions / Quiz Batch Settings. Add custom subject names, assign
+questions to them. Each subject includes all its assigned questions. Use Remove
+to exclude a subject. Names must be unique (case-insensitive), 1-100 characters. Save 1-4 distinct subjects,
+a quiz name, and a duration of 1-86400 seconds. Empty duration uses 60 seconds.
+Selection uses subject order and question ID order. Starting a batch fails with a
+clear message if there are no questions for a configured subject.
+
+### API and storage changes
+
+- GET/PUT /admin/quiz-config: admin-only configuration with quiz_name,
+  nullable duration_seconds, subjects [{name}], and available_subjects.
+- Admin question create/update/list supports nullable subject.
+- POST /quiz/start: authenticated, returns attempt_id, quiz_name, duration_seconds,
+  expires_at, and selected questions without answers.
+- POST /quiz/submit: accepts attempt_id and answers; grades the user's question
+  snapshot, counts unanswered questions, and saves one result per attempt.
+  Repeated submissions return the saved result.
+- Submission, history, and admin results consistently return quiz_name.
+
+MongoDB creates quiz_settings and quiz_attempts on first write. No destructive
+migration is needed. Until configuration is saved, all old questions remain
+playable. Assign unassigned questions to subjects in the editor to include them
+in a configured batch. Old results receive the fallback name General Quiz; new
+results retain the name captured at quiz start after later admin edits.
+The old GET /quiz/questions API remains available. Legacy submissions without an
+attempt ID are accepted only before a subject batch is configured.
+
+The browser enforces the countdown and automatically submits at expiry, with
+manual retry after network failure. It is not a tamper-proof server exam timer.
+
+Subject choices now come from the saved batch, with no predefined names. Existing
+subject configurations remain valid. Renaming/removing a subject does not change
+question assignments; reassign those questions explicitly in the admin editor.
+
+Legacy question_count settings are ignored; saving configuration removes them.
+Existing in-progress attempts retain their original question snapshots.

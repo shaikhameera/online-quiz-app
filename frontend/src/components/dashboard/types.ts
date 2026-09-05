@@ -10,5 +10,6 @@ export interface QuizAttempt {
   quizName: string;
   score: number;
   totalMarks: number;
+  percentage: number;
   attemptedAt: string;
 }

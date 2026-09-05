@@ -31,13 +31,33 @@ def get_all_users():
 
     return users
 
+@router.delete("/users/{user_id}")
+def delete_user(user_id: str):
+    try:
+        obj_id = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid User ID")
+
+    user = users_collection.find_one({"_id": obj_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.get("role") == "admin":
+        raise HTTPException(status_code=403, detail="Administrator accounts cannot be removed")
+
+    result = users_collection.delete_one({"_id": obj_id, "role": {"$ne": "admin"}})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=409, detail="User changed or was removed. Please refresh the user list.")
+
+    return {"message": "User removed"}
+
 @router.post("/questions")
 def add_question(question: QuestionCreate):
 
     result = questions_collection.insert_one({
         "question": question.question,
         "options": question.options,
-        "correct_answer": question.correct_answer
+        "correct_answer": question.correct_answer,
+        "subject": question.subject
     })
 
     return {
@@ -56,7 +76,8 @@ def get_all_questions():
             "id": str(q["_id"]),
             "question": q["question"],
             "options": q["options"],
-            "correct_answer": q["correct_answer"]
+            "correct_answer": q["correct_answer"],
+            "subject": q.get("subject")
         })
 
     return questions
@@ -81,7 +102,8 @@ def update_question(
             "$set": {
                 "question": question.question,
                 "options": question.options,
-                "correct_answer": question.correct_answer
+                "correct_answer": question.correct_answer,
+        "subject": question.subject
             }
         }
     )
@@ -129,6 +151,7 @@ def get_results():
     for result in results_collection.find():
 
         result["_id"] = str(result["_id"])
+        result["quiz_name"] = result.get("quiz_name") or "General Quiz"
 
         results.append(result)
 
@@ -142,3 +165,16 @@ def get_stats():
         "total_questions": questions_collection.count_documents({}),
         "total_results": results_collection.count_documents({})
     }
+
+
+from app.models.batch import BatchConfig
+from app.utils.batch import get_config, settings_collection
+
+@router.get("/quiz-config")
+def get_quiz_config():
+    return get_config()
+
+@router.put("/quiz-config")
+def save_quiz_config(config: BatchConfig):
+    settings_collection().replace_one({"_id": "default"}, {"_id": "default", **config.model_dump()}, upsert=True)
+    return get_config()

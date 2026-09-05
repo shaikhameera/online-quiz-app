@@ -9,3 +9,5 @@ class QuizAnswer(BaseModel):
 
 class QuizSubmission(BaseModel):
     answers: List[QuizAnswer]
+
+    attempt_id: str | None = None

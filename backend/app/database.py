@@ -11,3 +11,6 @@ db = client["online_quiz"]
 users_collection = db["users"]
 questions_collection = db["questions"]
 results_collection = db["results"]
+
+quiz_settings_collection = db["quiz_settings"]
+quiz_attempts_collection = db["quiz_attempts"]

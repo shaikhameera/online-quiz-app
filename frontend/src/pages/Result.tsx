@@ -34,7 +34,7 @@ const Result = () => {
               <div className="mb-4 text-6xl">🎉</div>
 
               <h1 className="text-4xl font-bold text-gray-900">
-                Quiz Completed
+                {result.quiz_name || "Quiz"} Completed
               </h1>
 
               <p className="mt-3 text-lg text-gray-500">
