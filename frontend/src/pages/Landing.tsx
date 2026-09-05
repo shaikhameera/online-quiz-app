@@ -85,6 +85,8 @@ export default function Landing() {
           <p>© 2026 Online Quiz Assessment. All rights reserved.</p>
 
           <p>Built with React • FastAPI • MongoDB</p>
+
+          <p>Made with ❤️ by Ameera</p>
         </div>
       </footer>
     </div>
