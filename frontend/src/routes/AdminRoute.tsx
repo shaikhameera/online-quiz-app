@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
+import labels from "../config/labels.json";
 
 export default function AdminRoute() {
   const { loading, user } = useAuth();
@@ -8,7 +9,7 @@ export default function AdminRoute() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Loading...
+        {labels.app.messages.loading}
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Navbar from "../components/common/Navbar/Navbar";
+import labels from "../config/labels.json";
 
 export default function Landing() {
   return (
@@ -12,17 +13,15 @@ export default function Landing() {
 
           {/* Heading */}
           <h1 className="text-5xl font-extrabold leading-tight text-slate-900 md:text-6xl">
-            Learn.
-            <span className="text-blue-600"> Practice.</span>
+            {labels.app.landing.headlineLearn}
+            <span className="text-blue-600">{labels.app.landing.headlinePractice}</span>
             <br />
-            Improve.
+            {labels.app.landing.headlineImprove}
           </h1>
 
           {/* Description */}
           <p className="mt-6 text-lg leading-8 text-slate-600">
-            Test your knowledge with interactive quizzes, receive instant
-            results, and monitor your learning progress through a simple and
-            modern quiz platform.
+            {labels.app.landing.description}
           </p>
 
           {/* Buttons */}
@@ -31,7 +30,7 @@ export default function Landing() {
               to="/login"
               className="rounded-full bg-blue-600 px-8 py-3 text-lg font-semibold text-white transition hover:bg-blue-700"
             >
-              Get Started
+              {labels.app.landing.getStarted}
             </Link>
           </div>
         </div>
@@ -39,41 +38,38 @@ export default function Landing() {
         {/* Feature Cards */}
         <div className="mt-20 grid w-full max-w-6xl gap-6 md:grid-cols-3">
           <div className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <div className="mb-4 text-5xl">📝</div>
+            <div className="mb-4 text-5xl">{labels.app.landing.features.interactiveIcon}</div>
 
             <h3 className="mb-3 text-xl font-bold text-slate-800">
-              Interactive Quizzes
+              {labels.app.landing.features.interactiveTitle}
             </h3>
 
             <p className="text-slate-600">
-              Practice with multiple quizzes designed to strengthen your
-              understanding of different topics.
+              {labels.app.landing.features.interactiveDescription}
             </p>
           </div>
 
           <div className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <div className="mb-4 text-5xl">📊</div>
+            <div className="mb-4 text-5xl">{labels.app.landing.features.resultsIcon}</div>
 
             <h3 className="mb-3 text-xl font-bold text-slate-800">
-              Instant Results
+              {labels.app.landing.features.resultsTitle}
             </h3>
 
             <p className="text-slate-600">
-              Get your score immediately after submitting a quiz and understand
-              how well you've performed.
+              {labels.app.landing.features.resultsDescription}
             </p>
           </div>
 
           <div className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-            <div className="mb-4 text-5xl">📚</div>
+            <div className="mb-4 text-5xl">{labels.app.landing.features.progressIcon}</div>
 
             <h3 className="mb-3 text-xl font-bold text-slate-800">
-              Track Progress
+              {labels.app.landing.features.progressTitle}
             </h3>
 
             <p className="text-slate-600">
-              View your quiz history and monitor your learning journey over
-              time.
+              {labels.app.landing.features.progressDescription}
             </p>
           </div>
         </div>
@@ -82,11 +78,11 @@ export default function Landing() {
       {/* Footer */}
       <footer className="border-t bg-white py-6">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 text-center text-sm text-slate-500 md:flex-row">
-          <p>© 2026 Online Quiz Assessment. All rights reserved.</p>
+          <p>{labels.app.landing.footer.copyright}</p>
 
-          <p>Built with React • FastAPI • MongoDB</p>
+          <p>{labels.app.landing.footer.technology}</p>
 
-          <p>Made with ❤️ by Ameera</p>
+          <p>{labels.app.landing.footer.author}</p>
         </div>
       </footer>
     </div>

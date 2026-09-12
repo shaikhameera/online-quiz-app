@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
+import labels from "../config/labels.json";
 
 export default function ProtectedRoute() {
   const { loading, isAuthenticated, user } = useAuth();
@@ -9,7 +10,7 @@ export default function ProtectedRoute() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        Loading...
+        {labels.app.messages.loading}
       </div>
     );
   }

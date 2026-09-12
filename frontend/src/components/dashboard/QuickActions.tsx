@@ -1,6 +1,7 @@
 import { Card } from "@heroui/react";
 import { HiPlay, HiClock } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
+import labels from "../../config/labels.json";
 
 const QuickActions = () => {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ const QuickActions = () => {
   return (
     <section className="mt-10">
       <h2 className="mb-5 text-2xl font-bold">
-        Quick Actions
+        {labels.app.dashboard.quickActions}
       </h2>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -22,10 +23,10 @@ const QuickActions = () => {
             </div>
 
             <div>
-              <Card.Title>Start Quiz</Card.Title>
+              <Card.Title>{labels.app.dashboard.startQuiz}</Card.Title>
 
               <Card.Description>
-                Take a new quiz and test your knowledge.
+                {labels.app.dashboard.startQuizDescription}
               </Card.Description>
             </div>
           </Card.Header>
@@ -41,10 +42,10 @@ const QuickActions = () => {
             </div>
 
             <div>
-              <Card.Title>Quiz History</Card.Title>
+              <Card.Title>{labels.app.dashboard.quizHistory}</Card.Title>
 
               <Card.Description>
-                View your previous quiz attempts.
+                {labels.app.dashboard.quizHistoryDescription}
               </Card.Description>
             </div>
           </Card.Header>

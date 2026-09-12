@@ -1,5 +1,6 @@
 import { Card } from "@heroui/react";
 import type { DashboardStats } from "./types";
+import labels from "../../config/labels.json";
 
 interface Props {
   stats: DashboardStats;
@@ -8,36 +9,36 @@ interface Props {
 const StatsCards = ({ stats }: Props) => {
   const cards = [
     {
-      title: "Highest Score",
+      title: labels.app.dashboard.highestScore,
       value:
         stats.highestScore !== null
-          ? `${stats.highestScore}%`
-          : "--",
+          ? labels.app.formats.percentage.replace("{value}", String(stats.highestScore))
+          : labels.app.formats.notAvailable,
     },
     {
-      title: "Last Score",
+      title: labels.app.dashboard.lastScore,
       value:
         stats.lastScore !== null
-          ? `${stats.lastScore}%`
-          : "--",
+          ? labels.app.formats.percentage.replace("{value}", String(stats.lastScore))
+          : labels.app.formats.notAvailable,
     },
     {
-      title: "Total Attempts",
+      title: labels.app.dashboard.totalAttempts,
       value: stats.totalAttempts,
     },
     {
-      title: "Average Score",
+      title: labels.app.dashboard.averageScore,
       value:
         stats.averageScore !== null
-          ? `${stats.averageScore}%`
-          : "--",
+          ? labels.app.formats.percentage.replace("{value}", String(stats.averageScore))
+          : labels.app.formats.notAvailable,
     },
   ];
 
   return (
     <section className="mt-10">
       <h2 className="mb-5 text-2xl font-bold">
-        Your Statistics
+        {labels.app.dashboard.statisticsTitle}
       </h2>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

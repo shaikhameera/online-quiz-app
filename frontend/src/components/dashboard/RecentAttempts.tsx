@@ -1,12 +1,13 @@
 import { Card } from "@heroui/react";
 import type { QuizAttempt } from "./types";
+import labels from "../../config/labels.json";
 
 interface Props {
   attempts: QuizAttempt[];
   title?: string;
 }
 
-const RecentAttempts = ({ attempts, title = "Recent Attempts" }: Props) => {
+const RecentAttempts = ({ attempts, title = labels.app.dashboard.recentAttempts }: Props) => {
   return (
     <section className="mt-10">
       <h2 className="mb-5 text-2xl font-bold">
@@ -18,10 +19,10 @@ const RecentAttempts = ({ attempts, title = "Recent Attempts" }: Props) => {
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b text-left">
-                <th className="p-4">Quiz</th>
-                <th className="p-4">Score</th>
-                <th className="p-4">Percentage</th>
-                <th className="p-4">Date</th>
+                <th className="p-4">{labels.app.dashboard.table.quiz}</th>
+                <th className="p-4">{labels.app.dashboard.table.score}</th>
+                <th className="p-4">{labels.app.dashboard.table.percentage}</th>
+                <th className="p-4">{labels.app.dashboard.table.date}</th>
               </tr>
             </thead>
 
@@ -32,7 +33,7 @@ const RecentAttempts = ({ attempts, title = "Recent Attempts" }: Props) => {
                     colSpan={4}
                     className="p-8 text-center text-gray-500"
                   >
-                    No quiz attempts yet.
+                    {labels.app.dashboard.noAttempts}
                   </td>
                 </tr>
               ) : (
@@ -46,10 +47,10 @@ const RecentAttempts = ({ attempts, title = "Recent Attempts" }: Props) => {
                     </td>
 
                     <td className="p-4">
-                      {attempt.score}/{attempt.totalMarks}
+                      {labels.app.formats.compactScore.replace("{score}", String(attempt.score)).replace("{total}", String(attempt.totalMarks))}
                     </td>
 
-                    <td className="p-4">{attempt.percentage}%</td>
+                    <td className="p-4">{labels.app.formats.percentage.replace("{value}", String(attempt.percentage))}</td>
                     <td className="p-4">
                       {new Date(
                         attempt.attemptedAt

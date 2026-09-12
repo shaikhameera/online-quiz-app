@@ -4,6 +4,7 @@ import { HiOutlineEye, HiOutlineEyeSlash } from "react-icons/hi2";
 import toast from "react-hot-toast";
 
 import { useAuth } from "../../hooks/useAuth";
+import labels from "../../config/labels.json";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ export default function Login() {
     event.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-      toast.error("Please fill in all fields.");
+      toast.error(labels.app.messages.fillAllFields);
       return;
     }
 
@@ -43,9 +44,9 @@ export default function Login() {
 
       await login(email, password);
 
-      toast.success("Login successful!");
+      toast.success(labels.app.auth.login.success);
     } catch {
-      toast.error("Invalid email or password.");
+      toast.error(labels.app.auth.login.invalidCredentials);
     } finally {
       setLoading(false);
     }
@@ -60,15 +61,15 @@ export default function Login() {
             to="/"
             className="text-3xl font-bold text-blue-600"
           >
-            Online Quiz Assessment
+            {labels.app.brand.name}
           </Link>
 
           <h1 className="mt-6 text-3xl font-bold text-slate-900">
-            Welcome Back
+            {labels.app.auth.login.title}
           </h1>
 
           <p className="mt-2 text-slate-600">
-            Login to continue your learning journey.
+            {labels.app.auth.login.description}
           </p>
         </div>
 
@@ -83,13 +84,13 @@ export default function Login() {
               htmlFor="email"
               className="mb-2 block font-medium text-slate-700"
             >
-              Email
+              {labels.app.forms.email}
             </label>
 
             <input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder={labels.app.auth.login.emailPlaceholder}
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-600"
@@ -102,14 +103,14 @@ export default function Login() {
               htmlFor="password"
               className="mb-2 block font-medium text-slate-700"
             >
-              Password
+              {labels.app.forms.password}
             </label>
 
             <div className="relative">
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
+                placeholder={labels.app.auth.login.passwordPlaceholder}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 outline-none transition focus:border-blue-600"
@@ -135,7 +136,7 @@ export default function Login() {
             disabled={loading}
             className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? labels.app.auth.login.loggingIn : labels.app.buttons.login}
           </button>
         </form>
 
@@ -145,7 +146,7 @@ export default function Login() {
             to="/"
             className="font-medium text-blue-600 transition hover:underline"
           >
-            ← Back to Home
+            {labels.app.auth.login.backHome}
           </Link>
         </div>
       </div>

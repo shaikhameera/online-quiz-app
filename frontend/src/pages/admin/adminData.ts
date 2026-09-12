@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { isAxiosError } from "axios";
 import api from "../../services/api";
+import labels from "../../config/labels.json";
 import type { Question } from "../../types/question";
 import type { User } from "../../types/user";
 
@@ -38,12 +39,12 @@ export interface AdminResult {
 
 export function errorMessage(error: unknown) {
   if (isAxiosError(error)) {
-    if (error.response?.status === 401) return "Your session has expired. Please log in again.";
-    if (error.response?.status === 403) return "You do not have permission to access this data.";
+    if (error.response?.status === 401) return labels.app.messages.sessionExpired;
+    if (error.response?.status === 403) return labels.app.messages.permissionDenied;
     const detail = error.response?.data?.detail;
     if (typeof detail === "string") return detail;
   }
-  return "Unable to complete the request. Please try again.";
+  return labels.app.messages.requestFailed;
 }
 
 export function useAdminData<T>(path: string) {
@@ -79,5 +80,5 @@ export function useAdminData<T>(path: string) {
 export function formatDate(value: string) {
   // The backend stores UTC dates without a timezone suffix.
   const date = new Date(/(?:Z|[+-]\d{2}:\d{2})$/i.test(value) ? value : `${value}Z`);
-  return Number.isNaN(date.getTime()) ? "Unknown date" : date.toLocaleString();
+  return Number.isNaN(date.getTime()) ? labels.app.messages.unknownDate : date.toLocaleString();
 }

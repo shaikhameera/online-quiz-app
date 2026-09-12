@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import Navbar from "../components/common/Navbar/Navbar";
+import labels from "../config/labels.json";
 
 import type { QuizResult } from "../types/result";
 
@@ -31,29 +32,29 @@ const Result = () => {
         <div className="mx-auto max-w-3xl px-6 py-12">
           <div className="rounded-2xl bg-white p-10 shadow-lg">
             <div className="text-center">
-              <div className="mb-4 text-6xl">🎉</div>
+              <div className="mb-4 text-6xl">{labels.app.result.celebrationIcon}</div>
 
               <h1 className="text-4xl font-bold text-gray-900">
-                {result.quiz_name || "Quiz"} Completed
+                {labels.app.result.completed.replace("{quizName}", result.quiz_name || labels.app.quiz.fallbackName)}
               </h1>
 
               <p className="mt-3 text-lg text-gray-500">
-                Great job! Here are your quiz results.
+                {labels.app.result.description}
               </p>
             </div>
 
             {/* Score */}
             <div className="mt-10 rounded-xl bg-blue-50 p-8 text-center">
               <p className="text-lg text-gray-600">
-                Your Score
+                {labels.app.result.yourScore}
               </p>
 
               <h2 className="mt-2 text-6xl font-bold text-blue-600">
-                {result.score} / {result.total_questions}
+                {labels.app.formats.score.replace("{score}", String(result.score)).replace("{total}", String(result.total_questions))}
               </h2>
 
               <p className="mt-4 text-2xl font-semibold text-green-600">
-                {result.percentage}%
+                {labels.app.formats.percentage.replace("{value}", String(result.percentage))}
               </p>
             </div>
 
@@ -61,7 +62,7 @@ const Result = () => {
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               <div className="rounded-xl border bg-white p-6 text-center shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-700">
-                  Total Questions
+                  {labels.app.result.totalQuestions}
                 </h3>
 
                 <p className="mt-3 text-4xl font-bold text-blue-600">
@@ -71,7 +72,7 @@ const Result = () => {
 
               <div className="rounded-xl border bg-white p-6 text-center shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-700">
-                  Correct
+                  {labels.app.result.correct}
                 </h3>
 
                 <p className="mt-3 text-4xl font-bold text-green-600">
@@ -81,7 +82,7 @@ const Result = () => {
 
               <div className="rounded-xl border bg-white p-6 text-center shadow-sm">
                 <h3 className="text-lg font-semibold text-gray-700">
-                  Wrong
+                  {labels.app.result.wrong}
                 </h3>
 
                 <p className="mt-3 text-4xl font-bold text-red-600">
@@ -93,7 +94,7 @@ const Result = () => {
             {/* Performance */}
             <div className="mt-10 rounded-xl bg-gray-100 p-6 text-center">
               <h3 className="text-xl font-semibold">
-                Performance
+                {labels.app.result.performance}
               </h3>
 
               <p
@@ -104,8 +105,8 @@ const Result = () => {
                 }`}
               >
                 {result.percentage >= 70
-                  ? "🎉 Congratulations! You Passed!"
-                  : "Keep Practicing! You'll Do Better Next Time."}
+                  ? labels.app.result.passed
+                  : labels.app.result.failed}
               </p>
             </div>
 
@@ -115,14 +116,14 @@ const Result = () => {
                 onClick={() => navigate("/home")}
                 className="rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white transition hover:bg-blue-700"
               >
-                Back to Dashboard
+                {labels.app.result.backDashboard}
               </button>
 
               <button
                 onClick={() => navigate("/quiz")}
                 className="rounded-lg border border-blue-600 px-8 py-3 font-semibold text-blue-600 transition hover:bg-blue-50"
               >
-                Retake Quiz
+                {labels.app.result.retake}
               </button>
             </div>
           </div>

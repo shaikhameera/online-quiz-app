@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { isAxiosError } from "axios";
 import Navbar from "../components/common/Navbar/Navbar";
+import labels from "../config/labels.json";
 
 import type { Question } from "../types/quiz";
 
@@ -42,7 +43,7 @@ const Quiz = () => {
       deadline.current = Date.now() + duration * 1000;
       setTimeLeft(duration);
     }).catch((error: unknown) => {
-      if (!controller.signal.aborted) setLoadError(isAxiosError(error) && typeof error.response?.data?.detail === "string" ? error.response.data.detail : "Unable to load the quiz. Please try again.");
+      if (!controller.signal.aborted) setLoadError(isAxiosError(error) && typeof error.response?.data?.detail === "string" ? error.response.data.detail : labels.app.quiz.loadError);
     }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, []);
@@ -93,7 +94,7 @@ const Quiz = () => {
     } catch (error) {
       hasSubmitted.current = false;
       setSubmitting(false);
-      setError(isAxiosError(error) && typeof error.response?.data?.detail === "string" ? error.response.data.detail : "Submission failed. Please retry; your answers are still here.");
+      setError(isAxiosError(error) && typeof error.response?.data?.detail === "string" ? error.response.data.detail : labels.app.quiz.submitError);
     }
   }, [answers, questions, navigate, attemptId]);
 
@@ -120,7 +121,7 @@ const Quiz = () => {
         <Navbar />
 
         <main className="flex min-h-screen items-center justify-center bg-gray-50">
-          <h2 className="text-2xl font-semibold">Loading Questions...</h2>
+          <h2 className="text-2xl font-semibold">{labels.app.quiz.loading}</h2>
         </main>
       </>
     );
@@ -132,7 +133,7 @@ const Quiz = () => {
         <Navbar />
 
         <main className="flex min-h-screen items-center justify-center bg-gray-50">
-          <div><h2 className="text-2xl font-semibold">{loadError || "No Questions Found"}</h2><button onClick={() => window.location.reload()} className="mt-4 text-blue-600">Try again</button></div>
+          <div><h2 className="text-2xl font-semibold">{loadError || labels.app.quiz.empty}</h2><button onClick={() => window.location.reload()} className="mt-4 text-blue-600">{labels.app.buttons.tryAgain}</button></div>
         </main>
       </>
     );
@@ -155,14 +156,14 @@ const Quiz = () => {
             <h1 className="text-3xl font-bold">{quizName}</h1>
 
             <div className="rounded-lg bg-red-100 px-4 py-2 font-semibold text-red-700">
-              Time Left: {formattedTime}
+              {labels.app.quiz.timeLeft.replace("{time}", formattedTime)}
             </div>
           </div>
 
-          {error && <div role="alert" className="mb-4 rounded-xl bg-red-50 p-4 text-red-700">{error} <button disabled={submitting} onClick={handleSubmit} className="underline">Retry submission</button></div>}
-          <div className="mb-4 flex flex-wrap gap-3">{[...new Set(questions.map((item) => item.subject || "Unassigned"))].map((subject) => <button key={subject} disabled={submitting} onClick={() => setCurrentQuestionIndex(questions.findIndex((item) => (item.subject || "Unassigned") === subject))} className={`rounded-lg px-4 py-2 ${question.subject === subject ? "bg-blue-600 text-white" : "bg-white"}`}>{subject}</button>)}</div>
+          {error && <div role="alert" className="mb-4 rounded-xl bg-red-50 p-4 text-red-700">{error} <button disabled={submitting} onClick={handleSubmit} className="underline">{labels.app.quiz.retrySubmission}</button></div>}
+          <div className="mb-4 flex flex-wrap gap-3">{[...new Set(questions.map((item) => item.subject || labels.app.quiz.unassignedSubject))].map((subject) => <button key={subject} disabled={submitting} onClick={() => setCurrentQuestionIndex(questions.findIndex((item) => (item.subject || labels.app.quiz.unassignedSubject) === subject))} className={`rounded-lg px-4 py-2 ${question.subject === subject ? "bg-blue-600 text-white" : "bg-white"}`}>{subject}</button>)}</div>
           <p className="mb-8 text-gray-500">
-            Question {currentQuestionIndex + 1} of {questions.length}
+            {labels.app.quiz.progress.replace("{current}", String(currentQuestionIndex + 1)).replace("{total}", String(questions.length))}
           </p>
 
           <div className="rounded-xl bg-white p-8 shadow">
@@ -192,7 +193,7 @@ const Quiz = () => {
               disabled={submitting || currentQuestionIndex === 0}
               className="rounded-lg border px-6 py-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Previous
+              {labels.app.buttons.previous}
             </button>
 
             {currentQuestionIndex === questions.length - 1 ? (
@@ -201,7 +202,7 @@ const Quiz = () => {
                 disabled={submitting}
                 className="rounded-lg bg-green-600 px-6 py-2 text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {submitting ? "Submitting..." : "Submit Quiz"}
+                {submitting ? labels.app.quiz.submitting : labels.app.quiz.submit}
               </button>
             ) : (
               <button
@@ -209,7 +210,7 @@ const Quiz = () => {
                 disabled={submitting}
                 className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Next
+                {labels.app.buttons.next}
               </button>
             )}
           </div>

@@ -8,6 +8,7 @@ import {
 
 import { useAuth } from "../../../hooks/useAuth";
 import type { NavbarProps } from "./types";
+import labels from "../../../config/labels.json";
 
 export default function Navbar({
   links = [],
@@ -43,7 +44,7 @@ export default function Navbar({
           to="/"
           className="text-2xl font-bold text-blue-600"
         >
-          🎓 QuizApp
+          {labels.app.brand.navbarTitle}
         </Link>
 
         {/* Desktop Navigation */}
@@ -87,7 +88,7 @@ export default function Navbar({
                 onClick={handleLogout}
                 className="rounded-full border border-red-500 px-4 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500 hover:text-white"
               >
-                Logout
+                {labels.app.buttons.logout}
               </button>
             </>
           ) : (
@@ -96,7 +97,7 @@ export default function Navbar({
                 to="/login"
                 className="rounded-full border border-blue-600 px-5 py-2 font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white"
               >
-                Login
+                {labels.app.buttons.login}
               </Link>
 
               {/* <Link
@@ -169,7 +170,7 @@ export default function Navbar({
                 onClick={handleLogout}
                 className="w-full rounded-lg bg-red-500 px-4 py-2 font-medium text-white transition hover:bg-red-600"
               >
-                Logout
+                {labels.app.buttons.logout}
               </button>
             </>
           ) : (
@@ -179,7 +180,7 @@ export default function Navbar({
                 onClick={closeMenu}
                 className="rounded-lg border border-blue-600 px-4 py-2 text-center font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white"
               >
-                Login
+                {labels.app.buttons.login}
               </Link>
 
               {/* <Link

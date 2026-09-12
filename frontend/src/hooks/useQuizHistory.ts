@@ -3,6 +3,7 @@ import { isAxiosError } from "axios";
 import { getQuizHistory } from "../services/quiz";
 import { useAuth } from "./useAuth";
 import type { QuizHistoryEntry } from "../types/result";
+import labels from "../config/labels.json";
 
 export function useQuizHistory() {
   const { user } = useAuth();
@@ -24,8 +25,8 @@ export function useQuizHistory() {
       if (!controller.signal.aborted) setState({
         email, revision, history: [],
         error: isAxiosError(error) && error.response?.status === 401
-          ? "Your session has expired. Please log in again."
-          : "Unable to load your quiz history. Please try again.",
+          ? labels.app.messages.sessionExpired
+          : labels.app.dashboard.historyLoadError,
       });
     });
     return () => controller.abort();

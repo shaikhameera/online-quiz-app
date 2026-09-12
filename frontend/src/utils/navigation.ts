@@ -1,3 +1,5 @@
+import labels from "../config/labels.json";
+
 export interface NavItem {
   label: string;
   path: string;
@@ -5,53 +7,53 @@ export interface NavItem {
 
 export const publicNavigation: NavItem[] = [
   {
-    label: "Home",
+    label: labels.app.navbar.home,
     path: "/",
   },
 ];
 
 export const userNavigation: NavItem[] = [
   {
-    label: "Home",
+    label: labels.app.navbar.home,
     path: "/home",
   },
   {
-    label: "Quiz",
+    label: labels.app.navbar.quiz,
     path: "/quiz",
   },
   {
-    label: "History",
+    label: labels.app.navbar.history,
     path: "/history",
   },
   {
-    label: "Profile",
+    label: labels.app.navbar.profile,
     path: "/profile",
   },
 ];
 
 export const adminNavigation: NavItem[] = [
   {
-    label: "Dashboard",
+    label: labels.app.navbar.dashboard,
     path: "/admin",
   },
   {
-    label: "Questions",
+    label: labels.app.navbar.questions,
     path: "/admin/questions",
   },
   {
-    label: "Users",
+    label: labels.app.navbar.users,
     path: "/admin/users",
   },
   {
-    label: "Results",
+    label: labels.app.navbar.results,
     path: "/admin/results",
   },
   {
-    label: "Stats",
+    label: labels.app.navbar.stats,
     path: "/admin/stats",
   },
   {
-    label: "Profile",
+    label: labels.app.navbar.profile,
     path: "/profile",
   },
 ];

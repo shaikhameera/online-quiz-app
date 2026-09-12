@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Button, Card } from "@heroui/react";
 import Navbar from "../../components/common/Navbar";
+import labels from "../../config/labels.json";
 import { adminNavigation } from "../../utils/navigation";
 import type { AdminStats } from "./adminData";
 
@@ -27,10 +28,10 @@ export function DataState({ loading, error, reload, children }: {
   reload: () => void;
   children: ReactNode;
 }) {
-  if (loading) return <p role="status" className="py-8 text-slate-600">Loading data...</p>;
+  if (loading) return <p role="status" className="py-8 text-slate-600">{labels.app.messages.loadingData}</p>;
   if (error) return <div role="alert" className="space-y-4 rounded-xl bg-red-50 p-6 text-red-700">
     <p>{error}</p>
-    <Button onPress={reload}>Try again</Button>
+    <Button onPress={reload}>{labels.app.buttons.tryAgain}</Button>
   </div>;
   return <>{children}</>;
 }
@@ -38,9 +39,9 @@ export function DataState({ loading, error, reload, children }: {
 export function SummaryCards({ stats }: { stats: AdminStats }) {
   return <div className="grid gap-6 sm:grid-cols-3">
     {[
-      ["Total Users", stats.total_users],
-      ["Total Questions", stats.total_questions],
-      ["Quiz Attempts", stats.total_results],
+      [labels.app.admin.summary.totalUsers, stats.total_users],
+      [labels.app.admin.summary.totalQuestions, stats.total_questions],
+      [labels.app.admin.summary.quizAttempts, stats.total_results],
     ].map(([label, value]) => <Card key={label}>
       <Card.Content className="p-6">
         <p className="text-sm text-gray-500">{label}</p>
