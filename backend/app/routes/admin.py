@@ -6,6 +6,8 @@ from app.database import (
 )
 from app.utils.admin import admin_required
 from app.models.question import QuestionCreate
+from app.models.user import AdminUserCreate, UserAccessUpdate
+from app.utils.security import hash_password
 from bson import ObjectId
 from fastapi import HTTPException
 
@@ -26,10 +28,54 @@ def get_all_users():
             "id": str(user["_id"]),
             "name": user["name"],
             "email": user["email"],
-            "role": user["role"]
+            "role": user["role"],
+            "can_take_test": user.get("can_take_test", True),
+            "can_retake_test": user.get("can_retake_test", True),
+            "is_first_login": user.get("is_first_login", False)
         })
 
     return users
+
+
+@router.post("/users", status_code=201)
+def create_user(user: AdminUserCreate):
+    if users_collection.find_one({"email": user.email}):
+        raise HTTPException(status_code=409, detail="Email already exists")
+
+    result = users_collection.insert_one({
+        "name": user.name,
+        "email": user.email,
+        "password": hash_password(user.password),
+        "role": "user",
+        "can_take_test": False,
+        "can_retake_test": False,
+        "is_first_login": True
+    })
+    return {
+        "id": str(result.inserted_id),
+        "name": user.name,
+        "email": user.email,
+        "role": "user",
+        "can_take_test": False,
+        "can_retake_test": False,
+        "is_first_login": True
+    }
+
+
+@router.patch("/users/{user_id}/access")
+def update_user_access(user_id: str, access: UserAccessUpdate):
+    try:
+        obj_id = ObjectId(user_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid User ID")
+
+    result = users_collection.update_one(
+        {"_id": obj_id, "role": {"$ne": "admin"}},
+        {"$set": access.model_dump()}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "Test access updated", **access.model_dump()}
 
 @router.delete("/users/{user_id}")
 def delete_user(user_id: str):

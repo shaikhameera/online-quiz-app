@@ -14,7 +14,7 @@ from app.models.quiz import QuizSubmission
 class BatchTests(unittest.TestCase):
     def setUp(self):
         self.db = types.ModuleType("app.database")
-        for name in ["questions_collection", "results_collection", "quiz_attempts_collection", "quiz_settings_collection"]:
+        for name in ["questions_collection", "results_collection", "quiz_attempts_collection", "quiz_settings_collection", "users_collection"]:
             setattr(self.db, name, MagicMock())
         self.modules = patch.dict(sys.modules, {"app.database": self.db})
         self.modules.start()
@@ -28,14 +28,52 @@ class BatchTests(unittest.TestCase):
         self.question = {"_id": ObjectId(), "question": "Q", "options": ["A", "B"], "correct_answer": "A", "subject": "English"}
         self.db.questions_collection.find.return_value.sort.return_value = [self.question]
         self.db.quiz_attempts_collection.insert_one.return_value.inserted_id = ObjectId()
+        self.db.results_collection.count_documents.return_value = 0
+        self.db.users_collection.find_one.return_value = {
+            "email": "a@example.com", "name": "A", "role": "user",
+            "can_take_test": True, "can_retake_test": True, "is_first_login": False,
+        }
 
     def test_start_selects_subject_and_hides_answers(self):
-        result = self.routes.start_batch(self.request)
+        with patch.object(self.routes.question_randomizer, "shuffle") as shuffle:
+            result = self.routes.start_batch(self.request)
         self.assertEqual(result["quiz_name"], "Term One")
         self.assertEqual(result["duration_seconds"], 120)
         self.db.questions_collection.find.assert_called_once_with({"subject": "English"})
+        shuffle.assert_called_once()
         self.assertNotIn("correct_answer", result["questions"][0])
         self.assertEqual(len(result["questions"]), 1)
+
+    def test_randomizes_each_subject_without_mixing_sections(self):
+        self.db.quiz_settings_collection.find_one.return_value = {
+            **self.config,
+            "subjects": [{"name": "English"}, {"name": "Science"}],
+        }
+        english = [
+            {**self.question, "_id": ObjectId(), "question": "English 1"},
+            {**self.question, "_id": ObjectId(), "question": "English 2"},
+        ]
+        science = [
+            {**self.question, "_id": ObjectId(), "question": "Science 1", "subject": "Science"},
+            {**self.question, "_id": ObjectId(), "question": "Science 2", "subject": "Science"},
+        ]
+        self.db.questions_collection.find.return_value.sort.side_effect = [english, science]
+
+        def reverse(section):
+            section.reverse()
+
+        with patch.object(self.routes.question_randomizer, "shuffle", side_effect=reverse) as shuffle:
+            result = self.routes.start_batch(self.request)
+
+        self.assertEqual(shuffle.call_count, 2)
+        self.assertEqual(
+            [question["question"] for question in result["questions"]],
+            ["English 2", "English 1", "Science 2", "Science 1"],
+        )
+        self.assertEqual(
+            [question["subject"] for question in result["questions"]],
+            ["English", "English", "Science", "Science"],
+        )
 
     def test_all_questions_selected_despite_legacy_count(self):
         self.db.quiz_settings_collection.find_one.return_value = {**self.config, "subjects": [{"name": "English", "question_count": 1}]}
@@ -58,6 +96,42 @@ class BatchTests(unittest.TestCase):
         result = self.routes.start_batch(self.request)
         self.assertIsNone(result["duration_seconds"])
         self.assertEqual(self.db.quiz_attempts_collection.insert_one.call_args.args[0]["duration_seconds"], 60)
+
+    def test_initial_test_requires_initial_access(self):
+        self.db.users_collection.find_one.return_value["can_take_test"] = False
+        self.db.results_collection.count_documents.return_value = 0
+        with self.assertRaises(HTTPException) as error:
+            self.routes.start_batch(self.request)
+        self.assertEqual(error.exception.status_code, 403)
+        self.db.quiz_attempts_collection.insert_one.assert_not_called()
+
+    def test_legacy_submission_cannot_bypass_initial_access(self):
+        self.db.users_collection.find_one.return_value["can_take_test"] = False
+        self.db.results_collection.count_documents.return_value = 0
+        with self.assertRaises(HTTPException) as error:
+            self.routes.submit_quiz(QuizSubmission(answers=[]), self.request)
+        self.assertEqual(error.exception.status_code, 403)
+        self.db.results_collection.insert_one.assert_not_called()
+
+    def test_retake_uses_retake_access_independently(self):
+        user = self.db.users_collection.find_one.return_value
+        user["can_take_test"] = False
+        user["can_retake_test"] = True
+        self.db.results_collection.count_documents.return_value = 1
+        self.assertEqual(self.routes.start_batch(self.request)["quiz_name"], "Term One")
+
+        user["can_take_test"] = True
+        user["can_retake_test"] = False
+        with self.assertRaises(HTTPException) as error:
+            self.routes.start_batch(self.request)
+        self.assertEqual(error.exception.status_code, 403)
+
+    def test_first_login_cannot_start_test(self):
+        self.db.users_collection.find_one.return_value["is_first_login"] = True
+        with self.assertRaises(HTTPException) as error:
+            self.routes.start_batch(self.request)
+        self.assertEqual(error.exception.status_code, 403)
+        self.db.results_collection.count_documents.assert_not_called()
 
     def test_configuration_validation(self):
         for changes in [{"duration_seconds": 0}, {"subjects": []}, {"subjects": self.config["subjects"] * 5}, {"subjects": self.config["subjects"] * 2}, {"quiz_name": "  "}]:

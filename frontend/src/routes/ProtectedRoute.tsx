@@ -1,9 +1,10 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
 
 export default function ProtectedRoute() {
-  const { loading, isAuthenticated } = useAuth();
+  const { loading, isAuthenticated, user } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -15,6 +16,10 @@ export default function ProtectedRoute() {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (user?.is_first_login && location.pathname !== "/profile") {
+    return <Navigate to="/profile" replace />;
   }
 
   return <Outlet />;

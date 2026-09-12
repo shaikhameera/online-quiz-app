@@ -14,8 +14,19 @@ from starlette.requests import Request
 class QuizHistoryTests(unittest.TestCase):
     def setUp(self):
         database = types.ModuleType("app.database")
+        self.database = database
         database.questions_collection = MagicMock()
         database.results_collection = MagicMock()
+        database.users_collection = MagicMock()
+        database.users_collection.find_one.return_value = {
+            "email": "first@example.com", "name": "First", "role": "user",
+            "can_take_test": True, "can_retake_test": True, "is_first_login": False,
+        }
+        database.users_collection = MagicMock()
+        database.users_collection.find_one.return_value = {
+            "email": "first@example.com", "name": "First", "role": "user",
+            "can_take_test": True, "can_retake_test": True, "is_first_login": False,
+        }
         self.results = database.results_collection
         spec = importlib.util.spec_from_file_location(
             "quiz_history_under_test", Path(__file__).parents[1] / "routes" / "quiz.py"
@@ -50,6 +61,14 @@ class QuizHistoryTests(unittest.TestCase):
         self.results.find.return_value.sort.return_value = []
         request = Request({"type": "http", "session": {"user": {"email": "new@example.com"}}})
         self.assertEqual(self.quiz.get_history(request), [])
+
+    def test_first_login_cannot_read_history(self):
+        self.database.users_collection.find_one.return_value["is_first_login"] = True
+        request = Request({"type": "http", "session": {"user": {"email": "first@example.com"}}})
+        with self.assertRaises(HTTPException) as error:
+            self.quiz.get_history(request)
+        self.assertEqual(error.exception.status_code, 403)
+        self.results.find.assert_not_called()
 
 
 if __name__ == "__main__":

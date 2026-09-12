@@ -19,7 +19,9 @@ export default function Login() {
   useEffect(() => {
     if (!user) return;
 
-    if (user.role === "admin") {
+    if (user.is_first_login) {
+      navigate("/profile", { replace: true });
+    } else if (user.role === "admin") {
       navigate("/admin", { replace: true });
     } else {
       navigate("/home", { replace: true });

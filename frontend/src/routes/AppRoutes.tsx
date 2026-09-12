@@ -13,6 +13,7 @@ import Register from "../pages/auth/Register";
 
 import Home from "../pages/Home";
 import History from "../pages/History";
+import Profile from "../pages/Profile";
 
 import Quiz from "../pages/Quiz";
 import Result from "../pages/Result";
@@ -39,6 +40,7 @@ export default function AppRoutes() {
 
         <Route element={<ProtectedRoute />}>
           <Route element={<UserLayout />}>
+            <Route path="/profile" element={<Profile />} />
             <Route path="/home" element={<Home />} />
             <Route path="/history" element={<History />} />
 

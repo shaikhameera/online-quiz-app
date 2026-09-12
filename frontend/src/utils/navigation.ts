@@ -23,6 +23,10 @@ export const userNavigation: NavItem[] = [
     label: "History",
     path: "/history",
   },
+  {
+    label: "Profile",
+    path: "/profile",
+  },
 ];
 
 export const adminNavigation: NavItem[] = [
@@ -45,5 +49,9 @@ export const adminNavigation: NavItem[] = [
   {
     label: "Stats",
     path: "/admin/stats",
+  },
+  {
+    label: "Profile",
+    path: "/profile",
   },
 ];

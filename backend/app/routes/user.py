@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
-from app.models.user import UserRegister
+from app.models.user import PasswordChange, UserLogin, UserRegister
 from app.database import users_collection
-from app.utils.security import hash_password
-from app.models.user import UserLogin
-from app.database import users_collection
-from app.utils.security import verify_password
+from app.utils.security import hash_password, verify_password
+from app.utils.user_access import current_database_user, user_response
 from app.utils.api_key import verify_api_key
 
 router = APIRouter(
@@ -29,7 +27,10 @@ def register(user: UserRegister):
         "name": user.name,
         "email": user.email,
         "password": hash_password(user.password),
-        "role": "user"
+        "role": "user",
+        "can_take_test": False,
+        "can_retake_test": False,
+        "is_first_login": False
     })
 
     return {
@@ -83,13 +84,24 @@ def logout(request: Request):
 
 @router.get("/me")
 def get_me(request: Request):
+    return user_response(current_database_user(request, users_collection, require_password_change=False))
 
-    user = request.session.get("user")
 
-    if not user:
-         raise HTTPException(
-            status_code=401,
-            detail="Not Logged In"
-        )
+@router.post("/change-password")
+def change_password(payload: PasswordChange, request: Request):
+    user = current_database_user(request, users_collection, require_password_change=False)
+    if not verify_password(payload.current_password, user["password"]):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    if verify_password(payload.new_password, user["password"]):
+        raise HTTPException(status_code=400, detail="New password must be different from the current password")
 
-    return user
+    result = users_collection.update_one(
+        {"_id": user["_id"]},
+        {"$set": {
+            "password": hash_password(payload.new_password),
+            "is_first_login": False,
+        }}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "Password changed successfully"}

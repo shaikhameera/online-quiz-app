@@ -1,5 +1,6 @@
-from fastapi import APIRouter
-from app.database import questions_collection
+from fastapi import APIRouter, Request
+from app.database import questions_collection, users_collection
+from app.utils.user_access import current_database_user
 
 router = APIRouter(
     prefix="/quiz",
@@ -7,7 +8,8 @@ router = APIRouter(
 )
 
 @router.get("/questions")
-def get_quiz_questions():
+def get_quiz_questions(request: Request):
+    current_database_user(request, users_collection)
 
     questions = []
 

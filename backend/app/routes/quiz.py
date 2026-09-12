@@ -1,24 +1,37 @@
 from fastapi import APIRouter, Request, HTTPException
 from bson import ObjectId
 from datetime import datetime, timezone
+from random import SystemRandom
 
 from app.database import (
     questions_collection,
-    results_collection
+    results_collection,
+    users_collection
 )
 
 from app.models.quiz import QuizSubmission
+from app.utils.user_access import current_database_user
 
 router = APIRouter(
     prefix="/quiz",
     tags=["Quiz"]
 )
 
+question_randomizer = SystemRandom()
+
+
+def ensure_test_start_access(user):
+    has_completed_test = results_collection.count_documents(
+        {"user_email": user["email"]}, limit=1
+    ) > 0
+    if has_completed_test and not user.get("can_retake_test", True):
+        raise HTTPException(status_code=403, detail="Your test retake has not been enabled by an administrator")
+    if not has_completed_test and not user.get("can_take_test", True):
+        raise HTTPException(status_code=403, detail="Your test access has not been enabled by an administrator")
+
 @router.get("/history")
 def get_history(request: Request):
-    user = request.session.get("user")
-    if not user:
-        raise HTTPException(status_code=401, detail="Login Required")
+    user = current_database_user(request, users_collection)
 
     history = []
     for result in results_collection.find(
@@ -45,16 +58,12 @@ def submit_quiz(
     request: Request
 ):
 
-    user = request.session.get("user")
-
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Login Required"
-        )
+    user = current_database_user(request, users_collection)
 
     if submission.attempt_id:
         return submit_batch(submission, user)
+
+    ensure_test_start_access(user)
 
     from app.utils.batch import get_config
     if get_config()["subjects"]:
@@ -135,18 +144,19 @@ def submit_quiz(
 def start_batch(request: Request):
     from app.database import quiz_attempts_collection
     from app.utils.batch import get_config
-    user = request.session.get("user")
-    if not user:
-        raise HTTPException(status_code=401, detail="Login Required")
+    user = current_database_user(request, users_collection)
+    ensure_test_start_access(user)
     config = get_config()
     selected = []
     for subject in config["subjects"]:
         questions = list(questions_collection.find({"subject": subject["name"]}).sort("_id", 1))
         if not questions:
             raise HTTPException(status_code=400, detail=f"No questions available for {subject['name']}. Please contact the administrator.")
+        question_randomizer.shuffle(questions)
         selected.extend(questions)
     if not config["subjects"]:
         selected = list(questions_collection.find().sort("_id", 1))
+        question_randomizer.shuffle(selected)
     if not selected:
         raise HTTPException(status_code=400, detail="No questions available")
     questions = [{"id": str(q["_id"]), "question": q["question"], "options": q["options"],

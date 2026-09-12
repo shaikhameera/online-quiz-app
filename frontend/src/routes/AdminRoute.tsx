@@ -21,5 +21,9 @@ export default function AdminRoute() {
     return <Navigate to="/" replace />;
   }
 
+  if (user.is_first_login) {
+    return <Navigate to="/profile" replace />;
+  }
+
   return <Outlet />;
 }

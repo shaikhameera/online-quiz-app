@@ -1,14 +1,10 @@
 from fastapi import Request, HTTPException
+from app.utils.user_access import current_database_user
 
 def admin_required(request: Request):
 
-    user = request.session.get("user")
-
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Login Required"
-        )
+    from app.database import users_collection
+    user = current_database_user(request, users_collection)
 
     if user.get("role") != "admin":
         raise HTTPException(

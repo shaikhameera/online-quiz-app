@@ -193,8 +193,9 @@ Configure the current batch in Admin / Questions / Quiz Batch Settings. Add cust
 questions to them. Each subject includes all its assigned questions. Use Remove
 to exclude a subject. Names must be unique (case-insensitive), 1-100 characters. Save 1-4 distinct subjects,
 a quiz name, and a duration of 1-86400 seconds. Empty duration uses 60 seconds.
-Selection uses subject order and question ID order. Starting a batch fails with a
-clear message if there are no questions for a configured subject.
+The configured subject order is preserved, while questions are shuffled independently
+inside every subject for each new attempt. Starting a batch fails with a clear message
+if there are no questions for a configured subject.
 
 ### API and storage changes
 
@@ -218,6 +219,31 @@ attempt ID are accepted only before a subject batch is configured.
 
 The browser enforces the countdown and automatically submits at expiry, with
 manual retry after network failure. It is not a tamper-proof server exam timer.
+
+## User access and first login
+
+User records include `can_take_test`, `can_retake_test`, and `is_first_login`.
+Administrators manage the two access flags independently from Admin / Users.
+The initial attempt checks `can_take_test`; after a completed result exists, a
+new attempt checks `can_retake_test`. These checks run against the current user
+record in MongoDB when `/quiz/start` is called, so direct API requests cannot
+bypass an administrator's setting.
+
+Accounts created by an administrator start with both access flags disabled and
+`is_first_login` enabled. Their first authenticated session can only access the
+profile and password-change flow. `POST /user/change-password` verifies the
+current password, saves the new hash, and clears `is_first_login`. Name and email
+are returned by `GET /user/me` but cannot be edited through the profile API.
+
+Run the compatibility migration once from the backend directory:
+
+```bash
+myenv\Scripts\python.exe migrations\001_add_user_access_flags.py
+```
+
+It grants existing accounts initial and retake access and marks their first-login
+flow complete. The API uses the same compatibility defaults for unmigrated legacy
+records, so deployment does not require downtime.
 
 Subject choices now come from the saved batch, with no predefined names. Existing
 subject configurations remain valid. Renaming/removing a subject does not change

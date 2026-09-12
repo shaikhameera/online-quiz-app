@@ -1,4 +1,5 @@
 import api from "./api";
+import type { User } from "../types/user";
 
 export const registerUser = async (
   name: string,
@@ -32,8 +33,19 @@ export const logoutUser = async () => {
   return response.data;
 };
 
-export const getCurrentUser = async () => {
-  const response = await api.get("/user/me");
+export const getCurrentUser = async (): Promise<User> => {
+  const response = await api.get<User>("/user/me");
 
+  return response.data;
+};
+
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string
+) => {
+  const response = await api.post("/user/change-password", {
+    current_password: currentPassword,
+    new_password: newPassword,
+  });
   return response.data;
 };
